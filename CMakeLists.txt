@@ -15,9 +15,13 @@ set(TERMUX_API_COMPONENT "${TERMUX_API_APP_PACKAGE_NAME}/${TERMUX_API_APP_JAVA_N
 set(TERMUX_API_SERVICE_COMPONENT "${TERMUX_API_APP_PACKAGE_NAME}/${TERMUX_API_APP_JAVA_NAMESPACE}.KeepAliveService" CACHE STRING
     "Termux:API keep-alive service component for am startservice/stopservice")
 
+# Enforce position-independent code. The Android NDK aarch64 clang in the
+# frozen Phase 0A builder does not default to -fPIC for function-pointer
+# references, which breaks linking the shared library.
+add_compile_options(-fPIC)
+
 add_library(termux-api SHARED termux-api.c)
 add_library(termux-api-static STATIC termux-api.c)
-set_target_properties(termux-api PROPERTIES POSITION_INDEPENDENT_CODE ON)
 set_target_properties(termux-api-static PROPERTIES OUTPUT_NAME termux-api)
 
 set(TERMUX_API_COMPILE_DEFINITIONS
