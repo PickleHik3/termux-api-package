@@ -17,6 +17,7 @@ set(TERMUX_API_SERVICE_COMPONENT "${TERMUX_API_APP_PACKAGE_NAME}/${TERMUX_API_AP
 
 add_library(termux-api SHARED termux-api.c)
 add_library(termux-api-static STATIC termux-api.c)
+set_target_properties(termux-api PROPERTIES POSITION_INDEPENDENT_CODE ON)
 set_target_properties(termux-api-static PROPERTIES OUTPUT_NAME termux-api)
 
 set(TERMUX_API_COMPILE_DEFINITIONS
