@@ -4,9 +4,29 @@ include(GNUInstallDirs)
 
 set(TERMUX_PREFIX ${CMAKE_INSTALL_PREFIX})
 
+set(TERMUX_API_APP_PACKAGE_NAME "com.termux.api" CACHE STRING
+    "Termux:API app package name")
+set(TERMUX_API_APP_JAVA_NAMESPACE "com.termux.api" CACHE STRING
+    "Termux:API app Java namespace (package of TermuxApiReceiver and KeepAliveService)")
+set(LISTEN_SOCKET_ADDRESS "${TERMUX_API_APP_PACKAGE_NAME}://listen" CACHE STRING
+    "Termux:API listen socket abstract namespace address")
+set(TERMUX_API_COMPONENT "${TERMUX_API_APP_PACKAGE_NAME}/${TERMUX_API_APP_JAVA_NAMESPACE}.TermuxApiReceiver" CACHE STRING
+    "Termux:API broadcast receiver component for am broadcast")
+set(TERMUX_API_SERVICE_COMPONENT "${TERMUX_API_APP_PACKAGE_NAME}/${TERMUX_API_APP_JAVA_NAMESPACE}.KeepAliveService" CACHE STRING
+    "Termux:API keep-alive service component for am startservice/stopservice")
+
 add_library(termux-api SHARED termux-api.c)
 add_library(termux-api-static STATIC termux-api.c)
 set_target_properties(termux-api-static PROPERTIES OUTPUT_NAME termux-api)
+
+set(TERMUX_API_COMPILE_DEFINITIONS
+    TERMUX_API_APP_PACKAGE_NAME="${TERMUX_API_APP_PACKAGE_NAME}"
+    TERMUX_API_APP_JAVA_NAMESPACE="${TERMUX_API_APP_JAVA_NAMESPACE}"
+    LISTEN_SOCKET_ADDRESS="${LISTEN_SOCKET_ADDRESS}"
+    TERMUX_API_COMPONENT="${TERMUX_API_COMPONENT}")
+
+target_compile_definitions(termux-api PRIVATE ${TERMUX_API_COMPILE_DEFINITIONS})
+target_compile_definitions(termux-api-static PRIVATE ${TERMUX_API_COMPILE_DEFINITIONS})
 
 add_executable(termux-api-broadcast termux-api-broadcast.c)
 target_link_libraries(termux-api-broadcast termux-api-static)
